@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>py2js.py &mdash; py2js v0.1 documentation</title>
+    <link rel="stylesheet" href="../static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <link rel="top" title="py2js v0.1 documentation" href="../index.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Builtins.js" href="builtins.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="builtins.html" title="Builtins.js"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">py2js v0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="py2js-py">
+<h1>py2js.py<a class="headerlink" href="#py2js-py" title="Permalink to this headline">¶</a></h1>
+<p>Python to JavaScript translator.</p>
+<p>It uses Python ASTs to take any Python code and translate it to JS. The
+generated JS code depends on the <tt class="docutils literal"><span class="pre">builtins.js</span></tt> library. Thanks to this clean
+separation, the py2js itself is a very small script, that does a fairly direct
+translation from Python to JS.</p>
+<p>The best way to learn py2js is to take some example from the examples/
+directory and start modifying it to do what you need.</p>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>You can use it by decorating any function/class by the <tt class="docutils literal"><span class="pre">JavaScript</span></tt>
+decorator, e.g. this code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nd">@JavaScript</span>
+<span class="k">class</span> <span class="nc">TestClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">alert</span><span class="p">(</span><span class="s">&#39;TestClass created&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">0</span>
+
+    <span class="k">def</span> <span class="nf">inc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">alert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="mf">1</span>
+
+<span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">TestClass</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>prints:</p>
+<div class="highlight-python"><pre>function TestClass() {
+    return new _TestClass();
+}
+function _TestClass() {
+    this.__init__();
+}
+_TestClass.__name__ = 'TestClass'
+_TestClass.prototype.__class__ = _TestClass
+_TestClass.prototype.__init__ = function() {
+    alert("TestClass created");
+    this.reset();
+}
+_TestClass.prototype.reset = function() {
+    this.value = 0;
+}
+_TestClass.prototype.inc = function() {
+    alert(this.value);
+    this.value += 1;
+}</pre>
+</div>
+<p>Alternatively, an equivalent way is to use <tt class="docutils literal"><span class="pre">JavaScript()</span></tt> as a function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">TestClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">alert</span><span class="p">(</span><span class="s">&#39;TestClass created&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">0</span>
+
+    <span class="k">def</span> <span class="nf">inc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">alert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="mf">1</span>
+
+<span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">JavaScript</span><span class="p">(</span><span class="n">TestClass</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="another-example">
+<h2>Another Example<a class="headerlink" href="#another-example" title="Permalink to this headline">¶</a></h2>
+<p>The goal of py2js is to eventually translate any Python code. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nd">@JavaScript</span>
+<span class="k">def</span> <span class="nf">test</span><span class="p">():</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">10</span><span class="p">):</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">a</span><span class="p">[</span><span class="mf">3</span><span class="p">:]</span>
+</pre></div>
+</div>
+<p>translates into:</p>
+<div class="highlight-python"><pre>function test() {
+    a = list([]);
+    var __dummy0__ = iter(range(10));
+    var __dummy1__ = false;
+    while (1) {
+        var i;
+        try {
+            i = __dummy0__.next();
+        } catch (__dummy2__) {
+            if (isinstance(__dummy2__, py.StopIteration)) {
+                __dummy1__ = true;
+                break;
+            } else {
+                throw __dummy2__;
+            }
+        }
+        a.append(i);
+    }
+    return a.__getitem__(slice(3, null));
+}</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">py2js.py</a><ul>
+<li><a class="reference external" href="#usage">Usage</a></li>
+<li><a class="reference external" href="#another-example">Another Example</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="builtins.html"
+                                  title="previous chapter">Builtins.js</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="examples.html"
+                                  title="next chapter">Examples</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../sources/src/py2js.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="builtins.html" title="Builtins.js"
+             >previous</a> |</li>
+        <li><a href="../index.html">py2js v0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, hp-FEM group at UNR.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+    </div>
+  </body>
+</html>

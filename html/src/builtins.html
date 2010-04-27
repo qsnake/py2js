@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Builtins.js &mdash; py2js v0.1 documentation</title>
+    <link rel="stylesheet" href="../static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <link rel="top" title="py2js v0.1 documentation" href="../index.html" />
+    <link rel="next" title="py2js.py" href="py2js.html" />
+    <link rel="prev" title="Welcome to py2js" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py2js.html" title="py2js.py"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Welcome to py2js"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">py2js v0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="builtins-js">
+<h1>Builtins.js<a class="headerlink" href="#builtins-js" title="Permalink to this headline">¶</a></h1>
+<p>JavaScript library that implements Python types and Python builtin functions.</p>
+<p>The goal of this library is to implement all Python builtin types and functions
+as a small standalone JS library, that anyone can use in their JS projects.
+Using this library, one can write a JS code that behaves pretty much like
+Python (e.g. for loops using iterators, lists, dicts, slicing, ...), except of
+course that sometimes you need to use quite verbose syntax, e.g.
+<tt class="docutils literal"><span class="pre">f.__getitem__(slice(1,</span> <span class="pre">null))</span></tt> instead of <tt class="docutils literal"><span class="pre">f[1:]</span></tt>. It is then a matter of
+a good Python to JavaScript translator to convert the Python syntax to JS with
+the help of this library.</p>
+<p>See the file <a class="reference external" href="http://github.com/mattpap/py2js/blob/master/tests/test_builtins.js">tests/test_builtins.js</a> for
+thorough tests that you can use as examples how to use the library. Below you
+can find a brief documentation with a few examples to get some idea what this
+library can do for you.</p>
+<div class="section" id="types">
+<h2>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h2>
+<p>It currently implements the following types:</p>
+<p><strong>iter</strong></p>
+<div class="highlight-python"><pre>js&gt; f = list([1, 4, 3])
+[1, 4, 3]
+js&gt; i = iter(f)
+&lt;iter of 1,4,3 at 0&gt;
+js&gt; i.next()
+1
+js&gt; i.next()
+4
+js&gt; i.next()
+3
+js&gt; i.next()
+uncaught exception: StopIteration: no more items</pre>
+</div>
+<p><strong>tuple</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">js</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">3</span><span class="p">])</span>
+<span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="n">js</span><span class="o">&gt;</span> <span class="n">f</span>
+<span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>list</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">js</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">3</span><span class="p">])</span>
+<span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">3</span><span class="p">]</span>
+<span class="n">js</span><span class="o">&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">4</span><span class="p">)</span>
+<span class="n">js</span><span class="o">&gt;</span> <span class="n">f</span>
+<span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>dict</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">js</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">({</span><span class="mf">1</span><span class="p">:</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">3</span><span class="p">:</span> <span class="mf">5</span><span class="p">})</span>
+<span class="p">{</span><span class="mf">1</span><span class="p">:</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">3</span><span class="p">:</span> <span class="mf">5</span><span class="p">}</span>
+<span class="n">js</span><span class="o">&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+<span class="mf">5</span>
+</pre></div>
+</div>
+<p><strong>slice</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">js</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">3</span><span class="p">])</span>
+<span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="n">js</span><span class="o">&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="n">null</span><span class="p">))</span>
+<span class="p">(</span><span class="mf">4</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="n">js</span><span class="o">&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">))</span>
+<span class="p">(</span><span class="mf">1</span><span class="p">,)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="builtin-functions">
+<h2>Builtin functions<a class="headerlink" href="#builtin-functions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>assert</li>
+<li>hasattr</li>
+<li>getattr</li>
+<li>setattr</li>
+<li>hash</li>
+<li>len</li>
+<li>str</li>
+<li>range</li>
+<li>map</li>
+<li>zip</li>
+<li>isinstance</li>
+<li>float</li>
+</ul>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">js</span><span class="o">&gt;</span> <span class="nb">range</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+<span class="p">[</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">]</span>
+<span class="n">js</span><span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mf">5</span><span class="p">))</span>
+<span class="mf">5</span>
+<span class="n">js</span><span class="o">&gt;</span> <span class="nb">hash</span><span class="p">(</span><span class="nb">tuple</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">]))</span>
+<span class="mf">221750528</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="exceptions">
+<h2>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>NotImplementedError</li>
+<li>ZeroDivisionError</li>
+<li>AssertionError</li>
+<li>AttributeError</li>
+<li>RuntimeError</li>
+<li>ImportError</li>
+<li>TypeError</li>
+<li>ValueError</li>
+<li>NameError</li>
+<li>IndexError</li>
+<li>KeyError</li>
+<li>StopIteration</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Builtins.js</a><ul>
+<li><a class="reference external" href="#types">Types</a></li>
+<li><a class="reference external" href="#builtin-functions">Builtin functions</a></li>
+<li><a class="reference external" href="#exceptions">Exceptions</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="../index.html"
+                                  title="previous chapter">Welcome to py2js</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="py2js.html"
+                                  title="next chapter">py2js.py</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../sources/src/builtins.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py2js.html" title="py2js.py"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Welcome to py2js"
+             >previous</a> |</li>
+        <li><a href="../index.html">py2js v0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, hp-FEM group at UNR.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+    </div>
+  </body>
+</html>
