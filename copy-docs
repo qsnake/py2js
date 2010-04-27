@@ -1,0 +1,6 @@
+rm -rf html
+cp -r doc/_build/html/ html
+cd html
+sphinx-to-github .
+cd ..
+git add html
