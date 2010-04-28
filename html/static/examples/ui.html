@@ -42,7 +42,7 @@ function checkHandler() {
     alert("Checked a menu item");
 }
 function toolbar_mesh1(b, e) {
-    canvas = Ext.getDom("canvas").getContext("2d");
+    var canvas = Ext.getDom("canvas").getContext("2d");
     canvas.fillText("Mesh I",100,10);
     canvas.fillStyle = "rgb(255, 255, 255)";
     canvas.fillRect(0,0,200,200);
@@ -56,7 +56,7 @@ function toolbar_mesh1(b, e) {
     canvas.stroke();
 }
 function toolbar_mesh2(b, e) {
-    canvas = Ext.getDom("canvas").getContext("2d");
+    var canvas = Ext.getDom("canvas").getContext("2d");
     canvas.fillText("Mesh II",100,10);
     canvas.fillStyle = "rgb(255, 255, 255)";
     canvas.fillRect(0,0,200,200);
@@ -70,7 +70,7 @@ function toolbar_mesh2(b, e) {
     canvas.stroke();
 }
 function toolbar_mesh3(b, e) {
-    canvas = Ext.getDom("canvas").getContext("2d");
+    var canvas = Ext.getDom("canvas").getContext("2d");
     canvas.fillText("Mesh III",100,10);
     canvas.fillStyle = "rgb(255, 255, 255)";
     canvas.fillRect(0,0,200,200);
