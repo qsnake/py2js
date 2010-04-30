@@ -184,6 +184,10 @@ function range(start, end, step) {
         return list(seq);
 }
 
+function xrange(start, end, step) {
+    return iter(range(start, end, step))
+}
+
 function map() {
     if (arguments.length < 2) {
         throw new py.TypeError("map() requires at least two args");
@@ -268,6 +272,10 @@ function isinstance(obj, cls) {
     }
 }
 
+function int(value) {
+    return value;
+}
+
 function float(value) {
     return value;
 }
@@ -277,6 +285,8 @@ function float(value) {
 function iter(obj) {
     if (obj instanceof Array) {
         return new _iter(obj);
+    } else if (typeof(obj) === "string") {
+        return iter(obj.split(""));
     } else if (obj.__class__ == _iter) {
         return obj;
     } else if (defined(obj.__iter__)) {
@@ -631,6 +641,10 @@ _list.prototype.pop = function() {
         return this._items.pop();
     } else
         throw new py.IndexError("pop from empty list");
+}
+
+_list.prototype.sort = function() {
+    this._items.sort();
 }
 
 /* Python 'dict' type */
