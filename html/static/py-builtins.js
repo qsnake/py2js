@@ -58,7 +58,7 @@ function _new(cls, arg) {
     return new cls(arg)
 }
 
-function to_js(obj) {
+function js(obj) {
     /*
        Converts (recursively) a Python object to a javascript builtin object.
 
@@ -68,12 +68,12 @@ function to_js(obj) {
        list -> Array
        dict -> Array
 
-       It uses the obj._to_js() if it is defined, otherwise it just returns the
-       same object. It is the responsibility of _to_js() to convert recursively
+       It uses the obj._js_() if it is defined, otherwise it just returns the
+       same object. It is the responsibility of _js_() to convert recursively
        the object itself.
     */
-    if (defined(obj._to_js))
-        return obj._to_js();
+    if ((obj != null) && defined(obj._js_))
+        return obj._js_();
     else
         return obj;
 }
@@ -108,11 +108,11 @@ for (var i in py.__exceptions__) {
     py[name].prototype.__class__ = py[name];
 
     py[name].prototype.__str__ = function() {
-        return this.__class__.__name__ + ": " + this.message;
+        return str(js(this.__class__.__name__) + ": " + js(this.message));
     }
 
     py[name].prototype.toString = function() {
-        return this.__str__();
+        return js(this.__str__());
     }
 }
 
@@ -156,10 +156,6 @@ function len(obj) {
     } else {
         throw new py.AttributeError(obj, '__name__');
     }
-}
-
-function str(obj) {
-    return obj.toString();
 }
 
 function range(start, end, step) {
@@ -272,12 +268,72 @@ function isinstance(obj, cls) {
     }
 }
 
-function int(value) {
+py.bool = function(a) {
+    if ((a != null) && defined(a.__bool__))
+        return a.__bool__();
+    else {
+        if (a)
+            return true;
+        else
+            return false;
+    }
+}
+
+py.eq = function(a, b) {
+    if ((a != null) && defined(a.__eq__))
+        return a.__eq__(b);
+    else if ((b != null) && defined(b.__eq__))
+        return b.__eq__(a);
+    else
+        return a == b;
+}
+
+py._int = function(value) {
     return value;
 }
 
-function float(value) {
+py._float = function(value) {
     return value;
+}
+
+py.max = function(list) {
+    if (len(list) == 0)
+        throw new py.ValueError("max() arg is an empty sequence");
+    else {
+        var result = null;
+
+        iterate(iter(list), function(item) {
+                if ((result == null) || (item > result))
+                    result = item;
+        });
+
+        return result;
+    }
+}
+
+py.min = function(list) {
+    if (len(list) == 0)
+        throw new py.ValueError("min() arg is an empty sequence");
+    else {
+        var result = null;
+
+        iterate(iter(list), function(item) {
+                if ((result == null) || (item < result))
+                    result = item;
+        });
+
+        return result;
+    }
+}
+
+py.sum = function(list) {
+    var result = 0;
+
+    iterate(iter(list), function(item) {
+        result += item;
+    });
+
+    return result;
 }
 
 /* Python 'iter' type */
@@ -309,11 +365,11 @@ _iter.prototype.__init__ = function(seq) {
 }
 
 _iter.prototype.__str__ = function () {
-    return "<iter of " + this._seq + " at " + this._index + ">";
+    return str("<iter of " + this._seq + " at " + this._index + ">");
 }
 
 _iter.prototype.toString = function () {
-    return this.__str__();
+    return js(this.__str__());
 }
 
 _iter.prototype.next = function() {
@@ -354,7 +410,7 @@ _slice.prototype.__init__ = function(start, stop, step) {
 }
 
 _slice.prototype.__str__ = function() {
-    return "slice(" + this.start + ", " + this.stop + ", " + this.step + ")";
+    return str("slice(" + this.start + ", " + this.stop + ", " + this.step + ")");
 };
 
 _slice.prototype.indices = function(n) {
@@ -403,9 +459,9 @@ _tuple.prototype.__init__ = function(seq) {
 
 _tuple.prototype.__str__ = function () {
     if (this.__len__() == 1) {
-        return "(" + this._items[0] + ",)";
+        return str("(" + this._items[0] + ",)");
     } else {
-        return "(" + this._items.join(", ") + ")";
+        return str("(" + this._items.join(", ") + ")");
     }
 }
 
@@ -426,14 +482,14 @@ _tuple.prototype.__eq__ = function (other) {
 }
 
 _tuple.prototype.toString = function () {
-    return this.__str__();
+    return js(this.__str__());
 }
 
-_tuple.prototype._to_js = function () {
+_tuple.prototype._js_ = function () {
     var items = [];
 
     iterate(iter(this), function(item) {
-        items.push(to_js(item));
+        items.push(js(item));
     });
 
     return items;
@@ -475,7 +531,7 @@ _tuple.prototype.__iter__ = function() {
 
 _tuple.prototype.__contains__ = function(item) {
     for (var index in this._items) {
-        if (item == this._items[index]) {
+        if (py.eq(item, this._items[index])) {
             return true;
         }
     }
@@ -563,14 +619,14 @@ _list.prototype.__class__ = _list;
 _list.prototype.__init__ = _tuple.prototype.__init__;
 
 _list.prototype.__str__ = function () {
-    return "[" + this._items.join(", ") + "]";
+    return str("[" + this._items.join(", ") + "]");
 }
 
 _list.prototype.__eq__ = _tuple.prototype.__eq__;
 
 _list.prototype.toString = _tuple.prototype.toString;
 
-_list.prototype._to_js = _tuple.prototype._to_js;
+_list.prototype._js_ = _tuple.prototype._js_;
 
 _list.prototype.__len__ = _tuple.prototype.__len__;
 
@@ -635,6 +691,14 @@ _list.prototype.append = function(value) {
     this._len = -1;
 }
 
+_list.prototype.extend = function(l) {
+    items = this._items;
+    iterate(iter(l), function(item) {
+        items.push(item);
+    });
+    this._len = -1;
+}
+
 _list.prototype.pop = function() {
     if (len(this) > 0) {
         this._len = -1;
@@ -662,7 +726,17 @@ _dict.prototype.__class__ = _dict;
 
 _dict.prototype.__init__ = function(args) {
     if (defined(args)) {
-        this._items = args;
+        if (defined(args.__iter__)) {
+            items = {};
+            iterate(iter(args), function(item) {
+                    key = js(item.__getitem__(0));
+                    value = item.__getitem__(1);
+                    items[key] = value;
+            });
+            this._items = items;
+        }
+        else
+            this._items = args;
     } else {
         this._items = {};
     }
@@ -672,22 +746,22 @@ _dict.prototype.__str__ = function () {
     var strings = [];
 
     for (var key in this._items) {
-        strings.push(str(key) + ": " + str(this._items[key]));
+        strings.push(js(str(key)) + ": " + js(str(this._items[key])));
     }
 
-    return "{" + strings.join(", ") + "}";
+    return str("{" + strings.join(", ") + "}");
 }
 
 _dict.prototype.toString = function () {
-    return this.__str__();
+    return js(this.__str__());
 }
 
-_dict.prototype._to_js = function () {
+_dict.prototype._js_ = function () {
     var items = {};
 
     var _this_dict = this; // so that we can access it from within the closure:
     iterate(iter(this), function(key) {
-        items[key] = to_js(_this_dict.__getitem__(key));
+        items[key] = js(_this_dict.__getitem__(key));
     });
 
     return items;
@@ -822,4 +896,185 @@ _dict.prototype.popitem = function() {
     } else {
         throw new py.KeyError("popitem(): dictionary is empty");
     }
+}
+
+/* Python 'str' type */
+
+function str(s) {
+    return new _str(s);
+}
+
+function _str(s) {
+    this.__init__(s);
+}
+
+_str.__name__ = 'str';
+_str.prototype.__class__ = _str;
+
+_str.prototype.__init__ = function(s) {
+    if (!defined(s)) {
+        this._obj = '';
+    } else {
+        if (typeof(s) === "string") {
+            this._obj = s;
+        } else if (defined(s.toString)) {
+            this._obj = s.toString();
+        } else if (defined(s.__str__)) {
+            this._obj = js(s.__str__());
+        } else
+            this._obj = js(s);
+    }
+}
+
+_str.prototype.__str__ = function () {
+    return this;
+}
+
+_str.prototype.__eq__ = function (other) {
+    if (other.__class__ == this.__class__) {
+        if (len(this) != len(other))
+            return false
+        for (var i = 0; i < len(this); i++) {
+            if (this._obj[i] != other._obj[i])
+                return false
+        }
+        return true
+    } else
+        return false
+}
+
+_str.prototype.toString = function () {
+    return js(this.__str__());
+}
+
+_str.prototype._js_ = function () {
+    return this._obj;
+}
+
+_str.prototype.__hash__ = function () {
+    var value = 0x345678;
+    var length = this.__len__();
+
+    for (var index in this._obj) {
+        value = ((1000003*value) & 0xFFFFFFFF) ^ hash(this._obj[index]);
+        value = value ^ length;
+    }
+
+    if (value == -1) {
+        value = -2
+    }
+
+    return value
+}
+
+_str.prototype.__len__ = function() {
+    return this._obj.length;
+}
+
+_str.prototype.__iter__ = function() {
+    return iter(this._obj);
+}
+
+_str.prototype.__bool__ = function() {
+    return py.bool(this._obj);
+}
+
+_str.prototype.__eq__ = function(s) {
+    if (typeof(s) === "string")
+        return this._obj == s;
+    else if (isinstance(s, _str))
+        return this._obj == s._obj;
+    else
+        return false;
+}
+
+_str.prototype.__contains__ = function(item) {
+    for (var index in this._obj) {
+        if (item == this._obj[index]) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+_str.prototype.__getitem__ = function(index) {
+    if (isinstance(index, _slice)) {
+        var s = index;
+        var inds = s.indices(len(this));
+        var start = inds.__getitem__(0);
+        var stop = inds.__getitem__(1);
+        var step = inds.__getitem__(2);
+        seq = "";
+        for (var i = start; i < stop; i += step) {
+            seq = seq + js(this.__getitem__(i));
+        }
+        return new this.__class__(seq);
+    } else if ((index >= 0) && (index < len(this)))
+        return this._obj[index]
+    else if ((index < 0) && (index >= -len(this)))
+        return this._obj[index+len(this)]
+    else
+        throw new py.IndexError("string index out of range");
+}
+
+_str.prototype.__setitem__ = function(index, value) {
+    throw new py.TypeError("'str' object doesn't support item assignment");
+}
+
+_str.prototype.__delitem__ = function(index) {
+    throw new py.TypeError("'str' object doesn't support item deletion");
+}
+
+_str.prototype.count = function(value) {
+    var count = 0;
+
+    for (var index in this._obj) {
+        if (value == this._obj[index]) {
+            count += 1;
+        }
+    }
+
+    return count;
+}
+
+_str.prototype.index = function(value, start, end) {
+    if (!defined(start)) {
+        start = 0;
+    }
+
+    for (var i = start; !defined(end) || (start < end); i++) {
+        var _value = this._obj[i];
+
+        if (!defined(_value)) {
+            break;
+        }
+
+        if (_value == value) {
+            return i;
+        }
+    }
+
+    throw new py.ValueError("substring not found");
+}
+
+_str.prototype.find = function(s) {
+    return this._obj.search(s);
+}
+
+_str.prototype.replace = function(old, _new, count) {
+    old = js(old);
+    _new = js(_new);
+    if (defined(count))
+        count = js(count);
+    else
+        count = -1;
+    old_s = "";
+    new_s = this._obj;
+    while ((count != 0) && (new_s != old_s)) {
+        old_s = new_s;
+        new_s = new_s.replace(old, _new);
+        count -= 1;
+    }
+    return new_s;
 }
