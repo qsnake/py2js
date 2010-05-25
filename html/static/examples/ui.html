@@ -340,13 +340,13 @@ var toolbar_mesh3 = $def({}, function(b, e) {
     canvas.lineTo(50,50);
     canvas.stroke();
 });
-var initialize = $def({}, function() {
+var initialize = function() {
     alert(str("0"));
     Ext.get(document.body).update(str("<div id='mesh-editor'></div><div id='mesh-editor-help'></div>"));
     Ext.QuickTips.init();
     get_toolbar();
     get_panel();
-});
+};
   Ext.onReady(initialize);
   </script>
 </head>
