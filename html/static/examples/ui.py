@@ -1,4 +1,5 @@
 def get_toolbar():
+    alert("1")
     items = [
             {"text":'File', "menu": [
                 {"text": 'Open...'},
@@ -58,7 +59,9 @@ def get_toolbar():
                 {'text': 'About Mesh Editor', 'handler': menu_about},
                 )},
             ]
+    alert("2")
     Toolbar({"renderTo": 'mesh-editor', "items": items})
+    alert("3")
     items = [
             { "icon": 'http://www.extjs.com/deploy/dev/examples/menu/list-items.gif', "cls": 'x-btn-icon',
                 "handler": toolbar_mesh1,

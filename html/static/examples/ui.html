@@ -170,6 +170,7 @@ var menu_help = $def({}, function(e, t) {
     w.show();
 });
 var get_toolbar = $def({}, function() {
+    alert(str("1"));
     var items = list([dict(tuple([
     tuple([str("text"), str("File")]),
     tuple([str("menu"), list([dict(tuple([
@@ -257,10 +258,12 @@ var get_toolbar = $def({}, function() {
     tuple([str("handler"), menu_about])
 ]))])])
 ]))]);
+    alert(str("2"));
     Toolbar(dict(tuple([
     tuple([str("renderTo"), str("mesh-editor")]),
     tuple([str("items"), items])
 ])));
+    alert(str("3"));
     items = list([dict(tuple([
     tuple([str("icon"), str("http://www.extjs.com/deploy/dev/examples/menu/list-items.gif")]),
     tuple([str("cls"), str("x-btn-icon")]),
