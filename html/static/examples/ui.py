@@ -165,6 +165,7 @@ def menu_help(e, t):
     w.show()
 
 def initialize():
+    alert("0")
     Ext.get(document.body).update("<div id='mesh-editor'></div><div id='mesh-editor-help'></div>")
     Ext.QuickTips.init()
     get_toolbar()
