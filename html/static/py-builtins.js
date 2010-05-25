@@ -1293,14 +1293,8 @@ function $def() {
         throw "ParseError: $def requires a function as the last argument";
 
     var match = (fn+'').match(fnrx);
-    alert("def5");
-    alert(fn)
-    alert(fnrx)
-    alert(match)
-    alert("def5");
     if (!match)
         throw "ParseError: sorry, something went wrong on my end; are you sure you're passing me a valid function?" + (fn+'');
-    alert("def6");
     fn.__args__ = match[1].split(',');
     if (fn.__args__.length == 1 && !fn.__args__[0].strip())
         fn.__args__ = [];
