@@ -1284,17 +1284,23 @@ String.prototype.strip = function(){
 };
 
 function $def() {
+    alert("def1");
     var args = to_array(arguments);
+    alert("def2");
     if (!args.length) {
         throw "$def requires at least one argument...";
     }
+    alert("def3");
     var fn = args.pop();
     if (typeof(fn)!=='function')
         throw "ParseError: $def requires a function as the last argument";
 
+    alert("def4");
     var match = (fn+'').match(fnrx);
+    alert("def5");
     if (!match)
         throw "ParseError: sorry, something went wrong on my end; are you sure you're passing me a valid function?" + (fn+'');
+    alert("def6");
     fn.__args__ = match[1].split(',');
     if (fn.__args__.length == 1 && !fn.__args__[0].strip())
         fn.__args__ = [];
