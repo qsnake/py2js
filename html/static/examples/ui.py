@@ -1,7 +1,3 @@
-import inspect
-
-from py2js import convert_py2js
-
 def get_toolbar():
     items = [
             {"text":'File', "menu": [
@@ -62,7 +58,7 @@ def get_toolbar():
                 {'text': 'About Mesh Editor', 'handler': menu_about},
                 )},
             ]
-    _new(Ext.Toolbar, js({"renderTo": 'mesh-editor', "items": items}))
+    Toolbar({"renderTo": 'mesh-editor', "items": items})
     items = [
             { "icon": 'http://www.extjs.com/deploy/dev/examples/menu/list-items.gif', "cls": 'x-btn-icon',
                 "handler": toolbar_mesh1,
@@ -74,31 +70,25 @@ def get_toolbar():
                 "handler": toolbar_mesh3,
             "tooltip": '<b>Draw Mesh III</b><br/>Show an example mesh' },
             ]
-    _new(Ext.Toolbar, js({"renderTo": 'mesh-editor', "items": items}))
+    Toolbar({"renderTo": 'mesh-editor', "items": items})
 
 def get_panel():
-    p = _new(Ext.Panel, js({
+    p = Panel({
             "renderTo": 'mesh-editor',
             "width": '200px',
             "title": 'Mesh',
             "html": "<canvas id='canvas' width='200' height='200'></canvas>",
             "collapsible": true
-            }))
-    if Ext.isIE:
-        # This is needed for IE to emulate the canvas element:
-        G_vmlCanvasManager.initElement(Ext.getDom('canvas'))
+            })
     return p
 
-def clickHandler():
-    alert('Clicked on a menu item')
-
 def toolbar_mesh1(b, e):
-    canvas = Ext.getDom(js('canvas')).getContext(js('2d'))
-    canvas.fillStyle = js('rgb(255, 255, 255)')
+    canvas = Canvas('canvas')
+    canvas.fillStyle = 'rgb(255, 255, 255)'
     canvas.fillRect(0, 0, 200, 200)
-    canvas.fillStyle = js('rgb(29, 65, 119)')
-    canvas.fillText(js("Mesh I"), 80, 10)
-    canvas.strokeStyle = js('rgb(0, 255, 0)')
+    canvas.fillStyle = 'rgb(29, 65, 119)'
+    canvas.fillText("Mesh I", 80, 10)
+    canvas.strokeStyle = 'rgb(0, 255, 0)'
     canvas.beginPath()
     canvas.moveTo(10, 10)
     canvas.lineTo(20, 50)
@@ -108,12 +98,12 @@ def toolbar_mesh1(b, e):
     canvas.stroke()
 
 def toolbar_mesh2(b, e):
-    canvas = Ext.getDom(js('canvas')).getContext(js('2d'))
-    canvas.fillStyle = js('rgb(255, 255, 255)')
+    canvas = Canvas('canvas')
+    canvas.fillStyle = 'rgb(255, 255, 255)'
     canvas.fillRect(0, 0, 200, 200)
-    canvas.fillStyle = js('rgb(29, 65, 119)')
-    canvas.fillText(js("Mesh II"), 80, 10)
-    canvas.strokeStyle = js('rgb(255, 0, 0)')
+    canvas.fillStyle = 'rgb(29, 65, 119)'
+    canvas.fillText("Mesh II", 80, 10)
+    canvas.strokeStyle = 'rgb(255, 0, 0)'
     canvas.beginPath()
     canvas.moveTo(100, 100)
     canvas.lineTo(200, 50)
@@ -123,12 +113,12 @@ def toolbar_mesh2(b, e):
     canvas.stroke()
 
 def toolbar_mesh3(b, e):
-    canvas = Ext.getDom(js('canvas')).getContext(js('2d'))
-    canvas.fillStyle = js('rgb(255, 255, 255)')
+    canvas = Canvas('canvas')
+    canvas.fillStyle = 'rgb(255, 255, 255)'
     canvas.fillRect(0, 0, 200, 200)
-    canvas.fillStyle = js('rgb(29, 65, 119)')
-    canvas.fillText(js("Mesh III"), 80, 10)
-    canvas.strokeStyle = js('rgb(0, 0, 255)')
+    canvas.fillStyle = 'rgb(29, 65, 119)'
+    canvas.fillText("Mesh III", 80, 10)
+    canvas.strokeStyle = 'rgb(0, 0, 255)'
     canvas.beginPath()
     canvas.moveTo(50, 50)
     canvas.lineTo(100, 180)
@@ -138,16 +128,10 @@ def toolbar_mesh3(b, e):
     canvas.stroke()
 
 def menu_about(e, t):
-    Ext.MessageBox.show(js({
-           "title": 'About',
-           "msg": 'FEMhub Mesh Editor, (c) 2010 hp-FEM group at UNR',
-           "buttons": Ext.MessageBox.OK,
-           "animEl": 'mb9',
-           "icon": Ext.MessageBox.INFO,
-        }))
+    info_box("About", "FEMhub Mesh Editor, (c) 2010 hp-FEM group at UNR")
 
 def menu_help(e, t):
-    tabs2 = _new(Ext.TabPanel, js({
+    tabs2 = TabPanel({
         "activeTab": 2,
         "width": 600,
         "height": 250,
@@ -166,21 +150,16 @@ def menu_help(e, t):
                 "title": 'About',
                 "html": "Developed by the <a href='http://hpfem.org/'>hp-FEM group</a> at UNR."
             }]
-}))
-    w = _new(Ext.Window, js({
+    })
+    w = Window({
                 "renderTo": 'mesh-editor-help',
                 "layout": 'fit',
                 "width": 500,
                 "height": 300,
                 "title": "Help",
                 "items": tabs2
-                }))
-
-
+                })
     w.show()
-
-def checkHandler():
-    alert('Checked a menu item')
 
 def initialize():
     Ext.get(document.body).update("<div id='mesh-editor'></div><div id='mesh-editor-help'></div>")
@@ -188,23 +167,103 @@ def initialize():
     get_toolbar()
     get_panel()
 
+
+#########################################################################
+# End of the section that works both on the desktop and in JS.
+
+# JS wrappers for Ext:
+
+class ExtObject(object):
+
+    def __init__(self, args):
+        self._obj = _new(eval("Ext." + self.__class__.__name__), js(args))
+
+    def _js_(self):
+        return self._obj
+
+class Window(ExtObject):
+
+    def show(self):
+        self._obj.show()
+
+class Panel(ExtObject):
+    pass
+
+class TabPanel(ExtObject):
+    pass
+
+class Toolbar(ExtObject):
+    pass
+
+def info_box(title, msg):
+    Ext.MessageBox.show(js({
+           "title": title,
+           "msg": msg,
+           "buttons": Ext.MessageBox.OK,
+           "animEl": 'mb9',
+           "icon": Ext.MessageBox.INFO,
+        }))
+
+class Canvas(object):
+
+    def __init__(self, id):
+        dom = Ext.getDom(js(id))
+        if Ext.isIE:
+            # This is needed for IE to emulate the canvas element:
+            G_vmlCanvasManager.initElement(dom)
+        self._obj = dom.getContext(js('2d'))
+
+    def fillRect(self, x1, y1, w, h):
+        self._obj.fillStyle = js(self.fillStyle)
+        self._obj.fillRect(x1, y1, w, h)
+
+    def fillText(self, text, x, y):
+        self._obj.fillStyle = js(self.fillStyle)
+        self._obj.fillText(js(text), x, y)
+
+    def beginPath(self):
+        self._obj.strokeStyle = js(self.strokeStyle)
+        self._obj.beginPath()
+
+    def moveTo(self, x, y):
+        self._obj.moveTo(x, y)
+
+    def lineTo(self, x, y):
+        self._obj.lineTo(x, y)
+
+    def stroke(self):
+        self._obj.stroke()
+
+##################################################
+# Main code that translates the above to JS
+
+import inspect
+
+from py2js import convert_py2js
+
 def main():
     funcs = [
+            ExtObject,
+            Window,
+            Panel,
+            TabPanel,
+            Toolbar,
+            info_box,
+            Canvas,
+
             menu_about,
             menu_help,
             get_toolbar,
             get_panel,
-            clickHandler,
-            checkHandler,
             toolbar_mesh1,
             toolbar_mesh2,
             toolbar_mesh3,
             initialize,
             ]
-    js = ""
+    source = ""
     for f in funcs:
-        obj_source = inspect.getsource(f)
-        js += convert_py2js(obj_source) + "\n"
+        source += inspect.getsource(f) + "\n"
+    js = convert_py2js(source)
 
     print """\
 <html>
