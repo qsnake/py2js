@@ -1,6 +1,7 @@
-from py2js import JavaScript
+import inspect
 
-@JavaScript
+from py2js import convert_py2js
+
 def get_toolbar():
     items = [
             {"text":'File', "menu": [
@@ -75,7 +76,6 @@ def get_toolbar():
             ]
     _new(Ext.Toolbar, js({"renderTo": 'mesh-editor', "items": items}))
 
-@JavaScript
 def get_panel():
     p = _new(Ext.Panel, js({
             "renderTo": 'mesh-editor',
@@ -89,11 +89,9 @@ def get_panel():
         G_vmlCanvasManager.initElement(Ext.getDom('canvas'))
     return p
 
-@JavaScript
 def clickHandler():
     alert('Clicked on a menu item')
 
-@JavaScript
 def toolbar_mesh1(b, e):
     canvas = Ext.getDom(js('canvas')).getContext(js('2d'))
     canvas.fillStyle = js('rgb(255, 255, 255)')
@@ -109,7 +107,6 @@ def toolbar_mesh1(b, e):
     canvas.lineTo(10, 10)
     canvas.stroke()
 
-@JavaScript
 def toolbar_mesh2(b, e):
     canvas = Ext.getDom(js('canvas')).getContext(js('2d'))
     canvas.fillStyle = js('rgb(255, 255, 255)')
@@ -125,7 +122,6 @@ def toolbar_mesh2(b, e):
     canvas.lineTo(100, 10)
     canvas.stroke()
 
-@JavaScript
 def toolbar_mesh3(b, e):
     canvas = Ext.getDom(js('canvas')).getContext(js('2d'))
     canvas.fillStyle = js('rgb(255, 255, 255)')
@@ -141,7 +137,6 @@ def toolbar_mesh3(b, e):
     canvas.lineTo(50, 50)
     canvas.stroke()
 
-@JavaScript
 def menu_about(e, t):
     Ext.MessageBox.show(js({
            "title": 'About',
@@ -151,7 +146,6 @@ def menu_about(e, t):
            "icon": Ext.MessageBox.INFO,
         }))
 
-@JavaScript
 def menu_help(e, t):
     tabs2 = _new(Ext.TabPanel, js({
         "activeTab": 2,
@@ -185,11 +179,9 @@ def menu_help(e, t):
 
     w.show()
 
-@JavaScript
 def checkHandler():
     alert('Checked a menu item')
 
-@JavaScript
 def initialize():
     Ext.get(document.body).update("<div id='mesh-editor'></div><div id='mesh-editor-help'></div>")
     Ext.QuickTips.init()
@@ -211,7 +203,8 @@ def main():
             ]
     js = ""
     for f in funcs:
-        js += str(f) + "\n"
+        obj_source = inspect.getsource(f)
+        js += convert_py2js(obj_source) + "\n"
 
     print """\
 <html>
