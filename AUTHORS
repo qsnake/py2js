@@ -13,3 +13,5 @@ People who contributed by sending at least one patch:
   Baniel <edn@emolson.net>
   Jonathan Fine <jfine@pytex.org>
   Pablo Angulo <pablo.angulo@uam.es>
+
+Tests were taken from js4py written by Jonathan Fine.
